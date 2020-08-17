@@ -1,0 +1,11 @@
+PySimpleGUI
+selenium
+os
+random
+time
+psutil
+re
+wget
+pywin32
+win32com.client
+zipfile
