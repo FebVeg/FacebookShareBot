@@ -52,7 +52,7 @@ ShareBOT
 
 **Come contattarmi per segnalarmi dei problemi?** Potrai inviarmi una email a questo indirizzo: febveg_sharebot_issues@hi2.in, come OGGETTO 'Problema ShareBOT, spiegandomi il problema o segnalandomi qualcosa. [Ogni consiglio è ben accetto!]
 
-> **SHA256 dell'eseguibile**: 
+> **SHA256 dell'eseguibile**: 5e36255bd54ae47cdab8ef818481e53b10a12427ee6b814a47ef191263da4953
 
 ### Screenshot
 ![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win1.png?raw=true)
