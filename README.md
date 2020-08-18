@@ -27,7 +27,7 @@ ShareBOT
 * [Python](https://www.python.org/downloads/)
 
 ## Versione BOT attuale
-* 2.3.4
+* 2.3.5
 * Attualmente l'eseguibile funziona solo sul sistema operativo _Windows 10_
 > Non avendo volontari per effettuare dei betatest, non posso da solo trovare tutti gli errori conoscendo il programma e il suo funzionamento.
 
@@ -43,7 +43,6 @@ ShareBOT
 
 ### Librerie non incluse in Python al momento dell'installazione
 * [selenium](https://pysimplegui.readthedocs.io/)
-* [PySimpleGui](http://selenium-python.readthedocs.io/)
 * [psutil](https://psutil.readthedocs.io/)
 * [wget](https://pypi.org/project/wget/)
 * [win32com.client](http://timgolden.me.uk/pywin32-docs/)
@@ -56,9 +55,10 @@ ShareBOT
 > **SHA256 dell'eseguibile**: 
 
 ### Screenshot
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr1.png?raw=true)
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr2.png?raw=true)
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr3.png?raw=true)
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr4.png?raw=true)
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr5.png?raw=true)
-![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/scr7.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win1.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win2.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win3.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/lin1.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/lin2.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/lin3.png?raw=true)
+![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/lin4.png?raw=true)
