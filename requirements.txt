@@ -1,4 +1,4 @@
-PySimpleGUI
+tkinter
 selenium
 os
 random
