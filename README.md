@@ -27,7 +27,7 @@ ShareBOT
 * [Python](https://www.python.org/downloads/)
 
 ## Versione BOT attuale
-* 2.3.5
+* 2.3.6
 * Attualmente l'eseguibile funziona solo sul sistema operativo _Windows 10_
 > Non avendo volontari per effettuare dei betatest, non posso da solo trovare tutti gli errori conoscendo il programma e il suo funzionamento.
 
@@ -35,13 +35,15 @@ ShareBOT
 * Condividi i post suoi tuoi gruppi Facebook senza fatica!
 * E' possibile estrarre i gruppi ed eliminare quelli a cui non vuoi inviare il messaggio!
 * Puoi salvare tutti i tuoi gruppi Facebook in un file di testo!
-* Dalla versione 2.3.1 è possibile eseguire il programma da Linux!
+* Dalla versione 2.3.1 è possibile eseguire il programma anche su Linux!
 
 ### Changelogs
 * Risolti errori nel codice
-* Aggiornata grafica e funzionamento di alcune funzioni
+* Aggiunto nuove funzioni di verifica nel programma
+* Rivista la funzione di interruzione del processo di condivisione (attualmente, se viene interrotto chiuderà il WebDriver in automatico)
 
 ### Librerie non incluse in Python al momento dell'installazione
+* [tkinter](https://docs.python.org/3/library/tk.html)
 * [selenium](https://pysimplegui.readthedocs.io/)
 * [psutil](https://psutil.readthedocs.io/)
 * [wget](https://pypi.org/project/wget/)
@@ -52,7 +54,7 @@ ShareBOT
 
 **Come contattarmi per segnalarmi dei problemi?** Potrai inviarmi una email a questo indirizzo: febveg_sharebot_issues@hi2.in, come OGGETTO 'Problema ShareBOT, spiegandomi il problema o segnalandomi qualcosa. [Ogni consiglio è ben accetto!]
 
-> **SHA256 dell'eseguibile**: 5e36255bd54ae47cdab8ef818481e53b10a12427ee6b814a47ef191263da4953
+> **SHA256 dell'eseguibile**: 923464e93ac7aabe62aac86dd70ad62b49e225ea867dec8514c5fc979b9ee85c
 
 ### Screenshot
 ![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win1.png?raw=true)
