@@ -41,6 +41,9 @@ ShareBOT
 * Risolti errori nel codice
 * Aggiunto nuove funzioni di verifica nel programma
 * Rivista la funzione di interruzione del processo di condivisione (attualmente, se viene interrotto chiuderà il WebDriver in automatico)
+* _Sicurezza_ Aggiunte verifiche di sicurezza
+* _Sicurezza_ Aggiunta funzione che elimina le variabili di autenticazione
+* _Sicurezza_ Aggiunto un controllo sull'eliminazione delle variabili di autenticazione
 
 ### Librerie non incluse in Python al momento dell'installazione
 * [tkinter](https://docs.python.org/3/library/tk.html)
@@ -54,7 +57,7 @@ ShareBOT
 
 **Come contattarmi per segnalarmi dei problemi?** Potrai inviarmi una email a questo indirizzo: febveg_sharebot_issues@hi2.in, come OGGETTO 'Problema ShareBOT, spiegandomi il problema o segnalandomi qualcosa. [Ogni consiglio è ben accetto!]
 
-> **SHA256 dell'eseguibile**: 923464e93ac7aabe62aac86dd70ad62b49e225ea867dec8514c5fc979b9ee85c
+> **SHA256 dell'eseguibile**: 2d5fa3e8c5311832cd186cab8d092044fc7a4abbe995c097261c76961d68fbde
 
 ### Screenshot
 ![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win1.png?raw=true)
