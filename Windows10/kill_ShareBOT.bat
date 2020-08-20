@@ -1,3 +1,4 @@
+@echo off
 echo.
 echo Chiusura forzata di ShareBOT in corso...
 timeout 3
