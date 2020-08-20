@@ -547,6 +547,10 @@ def lista_export():
             print("[LOG] Error: Effettua prima il Login")
             messagebox.showwarning('Warning', 'Effettua prima il Login')
             pass
+        elif str(lista_export_err) == "name 'driver_process' is not defined":
+            print('[LOG] Error: Processo del WebDriver non valorizzato, effettua prima il Login')
+            messagebox.showwarning('Warning', 'Processo del WebDriver non valorizzato, effettua prima il Login')
+            pass
         else:
             print("[LOG] Error: Errore nella funzione 'lista_export': " + str(lista_export_err))
             messagebox.showerror("Errore nella funzione 'lista_export'", str(lista_export_err))
