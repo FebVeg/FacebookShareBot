@@ -22,19 +22,24 @@ except Exception as e:
 def istruzioni():
     i = """Benvenuto in ShareBOT, programma che automatizza il processo di condivisione dei post su Facebook per tutti i volontari
 In questa mini-guida verrà scritto passo-passo il corretto funzionamento\n
-1.  Inserisci nel campo 'Autenticazione' le tue credenziali di Facebook (Nessun dato verrà salvato o condiviso a terzi)
-1a. Prima di effettuare qualsiasi operazione, effettua il Login\n
-2.  Una volta inseriti i campi di Autenticazione, premi Login per loggarti su Facebook
-2a. Potrai eseguire il Logout della tua utenza quando avrai finito di condividere il tuo appello usando Logout\n
+1.  Inserisci nel campo 'Autenticazione' le tue credenziali di Facebook e poi premi Login (Nessun dato verrà salvato o condiviso a terzi)
+1a. Si aprirà il browser, lascia eseguire le operazioni al computer, non dovrai fare nulla.
+1b. Le variabili che hanno come valore le tue credenziali verranno distrutte per proteggere la tua privacy
+1c. Il Browser, ovvero il WebDriver verrà eseguito in modalità INCOGNITO, ossia non salverà nessun dato in locale
+1d. Prima di effettuare qualsiasi operazione, effettua il Login\n
+2.  Sarà possibile eseguire la funzione di Logout quando si vuole. Quando avrai finito di condividere l'appello, utilizza Logout e lascia che il Bot esegue le sue operazioni
+2a. La funzione di Logout uscirà dal tuo account sfruttando le funzioni di Facebook per non salvare nessun dato alla chiusura del WebDriver.\n
 3.  Nel campo 'Importa / Esporta lista gruppi' è possibile importare da 'Importa' una lista precedentemente esportata
 3a. Se non hai una lista, effettua il Login ed infine usa il pulsante Esporta, verrà esportata ed importata automaticamente la lista dei tuoi gruppi di Facebook
-3b  Puoi modificare i gruppi prima di inviare l'appello, usando il tasto 'Modifica' ed eliminando l'intera riga del gruppo a cui non vuoi condividere l'appello\n
+3b  Puoi modificare i gruppi prima di inviare l'appello, usando il tasto 'Modifica' ed eliminando l'intera riga del gruppo a cui non vuoi condividere l'appello
+3c. E' possibile condividere su TUTTI i gruppi anche senza usare Esporta. Per farlo, esegui il login, imposta il messaggio ed infine usa Condividi\n
 4.  Nel campo 'Messaggio da condividere' dovrai scrivere il tuo appello\n
 5.  Nel campo 'Azioni' ci saranno 4 pulsanti
 5a. Il pulsante 'Condividi' serve per, una volta effettuato il login ed inseriti tutti i campi, avviare l'autocondivisione
 5b. Il pulsante 'Istruzioni' farà apparire questa schermata di avviso
 5c. Il pulsante 'Sviluppatore' aprirà il browser di default sulla pagina Github dello sviluppatore (Colui che ha programmato ShareBOT)
-5d. Il pulsante 'Esci' è una funzione di chiusura logica del programma, effettua delle verifiche sul funzionamento del WebDriver per chiudere i processi figli di ShareBOT [Usare per chiudere il programma]"""
+5d. Il pulsante 'Esci' è una funzione di chiusura logica del programma, effettua delle verifiche sul funzionamento del WebDriver per chiudere i processi figli di ShareBOT\n\n
+IMPORTANTE: Durante le operazioni, non sarà possibile utilizzare il programma. Il programma lavorerà da solo, non serve chiuderlo solo perchè 'non risponde' o sembra bloccato"""
     istruzioni_window = tk.Tk()
     istruzioni_window.title('Istruzioni - Guida')
     istruzioni_window.resizable(False, False)
@@ -153,10 +158,10 @@ class Webdriver:
         self.username = username
         self.password = password
 
-    def login(self, driver, url, session_id):
+    def login(self, driver, url, session_id, chrome_options):
         try:
             print("[LOG] Eseguo il login")
-            driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+            driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
             driver.get("https://mbasic.facebook.com/")
@@ -221,10 +226,10 @@ class Webdriver:
             messagebox.showerror("Errore nella funzione 'login'", str(login_err))
             pass
     
-    def logout(self, driver, url, session_id):
+    def logout(self, driver, url, session_id, chrome_options):
         try:
             print("[LOG] Eseguo il logout")
-            driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+            driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
             driver.get("https://mbasic.facebook.com/")
@@ -256,9 +261,9 @@ class Webdriver:
             messagebox.showerror("Errore nella funzione 'logout'", str(logout_err))
             pass
     
-    def cond_with_list(self, driver, url, session_id, lista, post):
+    def cond_with_list(self, driver, url, session_id, lista, post, chrome_options):
         try:
-            driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+            driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
             print("[LOG] Condivisione su tutti i gruppi nella lista in corso")
@@ -322,9 +327,9 @@ class Webdriver:
             print("[LOG] Error: Errore nella funzione 'cond_with_list': " + str(cond_with_list_err))
             messagebox.showerror("Errore nella funzione 'cond_with_list'", str(cond_with_list_err))
 
-    def cond_without_list(self, driver, url, session_id, post):
+    def cond_without_list(self, driver, url, session_id, post, chrome_options):
         try:
-            driver = webdriver.Remote(command_executor=url, desired_capabilities={})
+            driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
             print("[LOG] Condivisione su tutti i gruppi di cui fai parte")
@@ -392,9 +397,9 @@ class Webdriver:
             print("[LOG] Error: Errore nella funzione 'cond_without_list': " + str(cond_without_list_err))
             messagebox.showerror("Errore nella funzione 'cond_without_list'", str(cond_without_list_err))
 
-    def get_groups(self, driver, url, session_id):
+    def get_groups(self, driver, url, session_id, chrome_options):
         try:
-            driver = webdriver.Remote(command_executor=url,desired_capabilities={})
+            driver = webdriver.Remote(command_executor=url,desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
             print("[LOG] Estrazione dei gruppi in corso...")
@@ -429,7 +434,7 @@ def user_login():
     if len(email.get()) > 0:
         if len(password.get()) > 0:
             global utente
-            utente = Webdriver(email.get(), password.get()) 
+             
             ua = [
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36',
                 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; SV1; .NET CLR 1.1.4322)',
@@ -439,9 +444,11 @@ def user_login():
                 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36'
                 ]
             random_ua = "".join(choice(ua))
+            global chrome_options
             chrome_options = Options()
             chrome_options.add_argument("--incognito")
             chrome_options.add_argument('--user-agent="%s"' % (random_ua))
+            chrome_options.add_experimental_option('excludeSwitches', ['enable-logging'])
             print("[LOG] UserAgent: %s" % (random_ua))
 
             global driver
@@ -458,7 +465,8 @@ def user_login():
             print("[LOG] WebDriver process: " + str(driver_process))
             print("[LOG] WebDriver session id: " + session_id)
             print("[LOG] Il WebDriver è nella modalità 'incognito/privata' quindi non verrà salvato nessun dato sul browser")
-            utente.login(driver, url, session_id)
+            utente = Webdriver(email.get(), password.get())
+            utente.login(driver, url, session_id, chrome_options)
             pass
         else:
             print("[LOG] Campo password vuoto")
@@ -477,7 +485,7 @@ def user_logout():
             if chrome_process:
                 chrome_process = chrome_process[0]
                 if chrome_process.is_running():
-                    utente.logout(driver, url, session_id)
+                    utente.logout(driver, url, session_id, chrome_options)
                     pass
                 else:
                     print("[LOG] Warning: Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
@@ -520,7 +528,7 @@ def lista_export():
             if chrome_process:
                 chrome_process = chrome_process[0]
                 if chrome_process.is_running():
-                    utente.get_groups(driver, url, session_id)
+                    utente.get_groups(driver, url, session_id, chrome_options)
                     pass
                 else:
                     print("[LOG] Warning: Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
@@ -554,14 +562,14 @@ def user_share():
                 if chrome_process.is_running():
                     if len(lista.get()) > 1:
                         if path.exists(lista.get()):
-                            utente.cond_with_list(driver, url, session_id, lista.get(), post.get("1.0","end-1c"))
+                            utente.cond_with_list(driver, url, session_id, lista.get(), post.get("1.0","end-1c"), chrome_options)
                             pass
                         else:
                             print("[LOG] Errore: La lista sembra non essere accessibile o forse è danneggiata")
                             messagebox.showerror('Errore', 'La lista sembra non essere accessibile o forse è danneggiata')
                             pass
                     else:
-                        utente.cond_without_list(driver, url, session_id, post.get("1.0","end-1c"))
+                        utente.cond_without_list(driver, url, session_id, post.get("1.0","end-1c"), chrome_options)
                         pass
                 else:
                     print("[LOG] Warning: Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
@@ -613,7 +621,6 @@ def sviluppatore():
 def user_exit():
     try:         
         if driver_process.is_running():
-            print("[LOG] Controllo se il WebDriver è attivo")
             chrome_process = driver_process.children()
             if chrome_process:
                 chrome_process = chrome_process[0]
