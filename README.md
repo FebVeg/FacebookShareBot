@@ -27,7 +27,7 @@ ShareBOT
 * [Python](https://www.python.org/downloads/)
 
 ## Versione BOT attuale
-* 2.3.6
+* 2.3.8beta
 * Attualmente l'eseguibile funziona solo sul sistema operativo _Windows 10_
 > Non avendo volontari per effettuare dei betatest, non posso da solo trovare tutti gli errori conoscendo il programma e il suo funzionamento.
 
@@ -41,6 +41,8 @@ ShareBOT
 * Risolti errori nel codice
 * Rimosso dalla impostazioni del driver JavaScript per problemi legati alla violazione delle policy di Facebook (spam)
 * Riordinato le funzioni di verifica del WebDriver
+* Corretti alcuni errori
+* Attualmente sembra che la funzione di 'AntiSpam' sia stata risolta
 
 ### Librerie non incluse in Python al momento dell'installazione
 * [tkinter](https://docs.python.org/3/library/tk.html)
@@ -54,7 +56,7 @@ ShareBOT
 
 **Come contattarmi per segnalarmi dei problemi?** Potrai inviarmi una email a questo indirizzo: febveg_sharebot_issues@hi2.in, come OGGETTO 'Problema ShareBOT, spiegandomi il problema o segnalandomi qualcosa. [Ogni consiglio è ben accetto!]
 
-> **SHA256 dell'eseguibile**: 7854463efe46807c28ff3d881c2a6ae5824deb504467100408035eb059d53652
+> **SHA256 dell'eseguibile**: 2ffce3617990df2fb20c5fa3d3b132d4a6a2207f5ef0516015515fa437ecb58c
 
 ### Screenshot
 ![alt text](https://github.com/FebVeg/ShareBOT/blob/master/screenshots/win1.png?raw=true)
