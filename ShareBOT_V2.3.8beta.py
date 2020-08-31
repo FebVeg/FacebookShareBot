@@ -1,12 +1,39 @@
+print("ShareBOT - FebVeg")
+print("Configurazione automatica in corso...")
+
 SB_version = "2.3.8beta"
+facebook_groups = []
+
+class bcolors:
+    HEADER = '\033[95m'
+    OKBLUE = '\033[94m'
+    OKGREEN = '\033[92m'
+    WARNING = '\033[93m'
+    FAIL = '\033[91m'
+    ENDC = '\033[0m'
+    BOLD = '\033[1m'
+    UNDERLINE = '\033[4m'
 
 from time import strftime
 def printlog(log):
     now = strftime("[%H:%M:%S]")
-    print(now + " " + str(log))
+    if log.startswith("[STARTED]"):
+        print(bcolors.OKGREEN + now + " " + str(log) + bcolors.ENDC)
+    elif log.startswith("[SECURITY]"):
+        print(bcolors.OKBLUE + now + " " + str(log) + bcolors.ENDC)
+    elif log.startswith("[DRIVER]"):
+        print(bcolors.BOLD + now + " " + str(log) + bcolors.ENDC)
+    elif log.startswith("[ERROR]"):
+        print(bcolors.FAIL + now + " " + str(log) + bcolors.ENDC)
+    elif log.startswith("[WARNING]"):
+        print(bcolors.WARNING + now + " " + str(log) + bcolors.ENDC)
+    else:
+        print(now + " " + str(log))
+    with open("sharebot.log", "a", encoding='UTF-8') as sb_logs:
+        sb_logs.write(now + " " + str(log) + "\n")
 
 try:
-    printlog("Importazione librerie in corso...")
+    printlog("Importazione delle librerie")
     from tkinter import *
     from tkinter.ttk import *
     import tkinter as tk
@@ -26,11 +53,11 @@ try:
     import re
     import pyperclip
     printlog("Librerie importate")
-except Exception as e:
-    printlog("[FATAL] Libreria mancante: " + str(e))
+except Exception as lib_err:
+    printlog("[ERROR] " + str(lib_err))
 
 def istruzioni():
-    printlog("Apro Istruzioni...")
+    printlog("[STARTED] Istruzioni")
     i = """Benvenuto in ShareBOT, programma che automatizza il processo di condivisione dei post su Facebook per tutti i volontari
 In questa mini-guida verrà scritto passo-passo il corretto funzionamento\n
 1.  Inserisci nel campo 'Autenticazione' le tue credenziali di Facebook e poi premi Login (Nessun dato verrà salvato o condiviso a terzi)
@@ -57,39 +84,32 @@ IMPORTANTE: Durante le operazioni, non sarà possibile utilizzare il programma. 
     Label(istruzioni_window, text=str(i)).grid(row=0, column=0, padx=5, pady=5)
     istruzioni_window.mainloop()
 
+# Auto configurazione iniziale
 try:
-    printlog("Imposto la cartella di lavoro...")
+    printlog("Preparazione cartella di lavoro")
     if name == "nt":
         dirFile = path.dirname(path.abspath(__file__)) + "\\" # Default dir
     elif name == "posix":
         dirFile = path.dirname(path.abspath(__file__)) + "/" # Default dir
-    printlog("Ogni file verrà salvato nella stessa cartella di ShareBOT")
+    printlog(f"Cartella di lavoro: {dirFile}")
 except Exception as dirFile_err:
-    printlog("Errore: " + str(dirFile_err))
-
-printlog("Creo la variabile che conterrà i gruppi della lista gruppi...")
-try:
-    facebook_groups = []
-except Exception as fb_g_err:
-    printlog("Errore: " + str(fb_g_err))
-
-# Auto configurazione iniziale
-printlog("Autoconfigurazione in corso...")
-printlog("Non chiudere questa finestra!")
+    printlog(f"[ERROR] {str(dirFile_err)}")
 
 try:
-    printlog("Verifico la presenza di Chrome...")
+    printlog("Verificando la presenza di Google Chrome")
     if name == "nt":
         if path.exists(r"C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"):
-            printlog("Chrome trovato")
-            printlog("Controllando l'esistenza del WebDriver...")
+            printlog("Google Chrome esistente")
+            printlog("Controllando l'esistenza del WebDriver")
 
             if path.exists(dirFile + 'chromedriver.exe'):
                 printlog("WebDriver trovato")
             else:
-                printlog("WebDriver non trovato. Recupero della versione di Chrome...")
-                
+                printlog("[WARNING] WebDriver non trovato")
+                printlog("Recupero versione di Google Chrome installata")
+
                 def get_version_via_com(filename): # Thanks to temascal
+                    printlog("Importazione libreria Dispatch da win32com.client")
                     from win32com.client import Dispatch
                     parser = Dispatch("Scripting.FileSystemObject")
                     try:
@@ -111,15 +131,14 @@ try:
                     chrome85 = "https://chromedriver.storage.googleapis.com/85.0.4183.38/chromedriver_win32.zip"
 
                     def unzip(arg):
-                        printlog("Estraendo il WebDriver dal file compresso...")
+                        printlog("Estrazione del WebDriver dal file compresso")
                         try:
                             import zipfile
                             with zipfile.ZipFile(arg, 'r') as zip_ref:
                                 zip_ref.extractall(dirFile)
                             printlog("File estratto")
                         except Exception as zip_err:
-                            printlog("Errore durante la lavorazione del file compresso: " + str(zip_err))
-                            messagebox.showerror('Errore durante la lavorazione del file compresso', str(zip_err))
+                            printlog(f"[ERROR] Errore durante l'estrazione: {str(zip_err)}")
                             input("Premi INVIO per continuare")
                             exit()
 
@@ -136,8 +155,8 @@ try:
                         wget.download(chrome85, dirFile + 'chromedriver_win32.zip', bar=progress_bar)
                         unzip(dirFile + 'chromedriver_win32.zip')
                     else:
-                        printlog("Versione di Chrome non scritta nel programma, aggiorna Google Chrome ad una di queste tre versioni: 83, 84, 85")
-                        messagebox.showerror('Errore', 'Versione di Chrome non scritta nel programma, aggiornare Google Chrome ad una di queste tre versioni: 83, 84, 85')
+                        printlog("[ERROR] Versione di Chrome non scritta nel programma.")
+                        printlog("Si prega di aggiornare Google Chrome ad una di queste seguenti versioni: 83, 84, 85")
                         input("Premi INVIO per continuare")
                         exit()
 
@@ -148,20 +167,18 @@ try:
                             remove(dirFile+"chromedriver_win32.zip")
                             printlog("File compresso rimosso")
                         else:
-                            printlog("File compresso non esistente")
+                            printlog("[WARNING] File compresso non esistente")
                     except Exception as rem_zip:
-                        printlog("Rimozione del file compresso non riuscita")
+                        printlog(f"[ERROR] {rem_zip}")
                         pass
-                    printlog("Avvio il programma")
-                except Exception as e:
-                    printlog("Errore durante il downloading del WebDriver: " + str(e))
-                    messagebox.showerror('Errore durante il downloading del WebDriver', str(e))
+                    printlog("[STARTED] Avvio di ShareBOT")
+                except Exception as download_error:
+                    printlog("Errore durante il downloading del WebDriver: " + str(download_error))
                     input("Premi INVIO per continuare")
                     exit()
         else:
-            printlog("Google Chrome non trovato")
-            printlog("Per far funzionare il programma, hai bisogno di installare Google Chrome")
-            messagebox.showwarning('Google Chrome non trovato', "Per far funzionare il programma, hai bisogno di installare Google Chrome")
+            printlog("[ERROR] Google Chrome non trovato")
+            printlog("[WARNING] Per far funzionare il programma, hai bisogno di installare Google Chrome")
             exit()
 
     elif name == "posix":
@@ -170,134 +187,135 @@ try:
             chromedriver = "/snap/bin/chromium.chromedriver"
             environ["WebDriver.chrome.driver"] = chromedriver
         else:
-            printlog("WebDriver non trovato, installazione in corso...")
+            printlog("[WARNING] WebDriver non trovato, installazione in corso...")
             system("sudo apt update; sudo apt install chromium* -y")
             printlog("Se non hai interrotto il processo, il WebDriver sarà stato installato")
 except Exception as verify_chrome_err:
-    printlog("Errore durante la verifica della presenza di Chrome: " + str(verify_chrome_err))
+    printlog(f"[ERROR] {str(verify_chrome_err)}")
 
 class Webdriver:
     def __init__(self, username, password):
+        printlog("Classe: Variabili valorizzate")
         self.username = username
         self.password = password
 
     def login(self, driver, url, session_id, chrome_options):
         try:
-            printlog("Login in corso...")
+            printlog("[STARTED] Login")
             driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
-            printlog("Sessione remota del WebDriver: " + session_id)
-            printlog("URL server locale di controllo: " + url)
+            printlog("[DRIVER] Sessione remota del WebDriver: " + session_id)
+            printlog("[DRIVER] URL server locale di controllo: " + url)
             driver.get("https://mbasic.facebook.com/")
             if driver.find_element_by_name("email"):
                 element = driver.find_element_by_name("email")
                 element.send_keys(self.username)
-                printlog("Email inserita: " + self.username)
+                printlog("[DRIVER] Email inserita: " + self.username)
                 if driver.find_element_by_name("pass"):
                     element = driver.find_element_by_name("pass")
                     element.send_keys(self.password)
-                    printlog("Password inserita")
+                    printlog("[DRIVER] Password inserita")
                     pass
                 else:
-                    printlog("Campo password non trovato")
+                    printlog("[ERROR][DRIVER] Campo password non trovato")
                     messagebox.showerror("Errore", "Campo PASSWORD non trovato")
                     exit()
             else:
-                printlog("Campo email non trovato")
+                printlog("[ERROR][DRIVER] Campo email non trovato")
                 messagebox.showerror("Errore", "Campo EMAIL non trovato")
                 exit()             
-            printlog("Security: Rimozione delle variabili 'email' e 'password' in corso...")
+            printlog("[SECURITY] Rimozione delle variabili 'email' e 'password' in corso...")
             try:
                 del self.username 
                 del self.password
-                printlog("Security: Variabili rimosse, eseguo un secondo controllo...")
+                printlog("[SECURITY] Variabili rimosse, eseguo un secondo controllo...")
 
                 # Controllo la variabile username
                 if 'username' in dir(self):
                     if len(self.username) > 0:
-                        printlog("[WARNING] Security: Variabile 'username' NON rimossa con valore integro")
+                        printlog("[WARNING][SECURITY] Variabile 'username' NON rimossa con valore integro")
                     else:
-                        printlog("[WARNING] Security: Variabile 'username' NON rimossa ma senza valore")
+                        printlog("[WARNING][SECURITY] Variabile 'username' NON rimossa ma senza valore")
                 else:
-                    printlog("Security: Variabile 'username' inesistente [OKAY]")
+                    printlog("[SECURITY] Variabile 'username' inesistente")
                     pass
 
                 # Controllo la variabile password
                 if 'password' in dir(self):
                     if len(self.password)> 0:
-                        printlog("[WARNING] Security: Variabile 'password' NON rimossa con valore integro")
+                        printlog("[WARNING] [SECURITY] Variabile 'password' NON rimossa con valore integro")
                     else:
-                        printlog("[WARNING] Security: Variabile 'password' NON rimossa ma senza valore")
+                        printlog("[WARNING] [SECURITY] Variabile 'password' NON rimossa ma senza valore")
                 else:
-                    printlog("Security: Variabile 'password' inesistente [OKAY]")
+                    printlog("[SECURITY] Variabile 'password' inesistente")
                     pass
 
             except Exception as del_err:
-                printlog("Security Non sono riuscito a rimuovere i valori delle variabili 'email' e 'password': " + str(del_err))
+                printlog("[WARNING][SECURITY] Non sono riuscito a rimuovere i valori delle variabili 'email' e 'password': " + str(del_err))
                 pass
             else:
-                printlog("Security: Variabili rimosse correttamente")
+                printlog("[SECURITY] Variabili rimosse correttamente")
                 pass
-            printlog("Security: Rimozione del campo 'Password' dall'interfaccia grafica...")
+            printlog("[SECURITY] Rimozione del campo 'Password' dall'interfaccia grafica")
             try:
                 password.delete(0, END) # Elimino la stringa della Entry
             except Exception as gui_delpass_err:
-                printlog("[WARNING] Security: Rimozione del campo 'Password' dall'interfaccia grafica NON riuscita: " + str(gui_delpass_err))
+                printlog("[ERROR][SECURITY] Rimozione del campo 'Password' dall'interfaccia grafica NON riuscita: " + str(gui_delpass_err))
             else:
-                printlog("Security: Rimozione del campo 'Password' dall'interfaccia grafica... [OKAY]")
+                printlog("[SECURITY] Rimozione del campo 'Password' dall'interfaccia grafica")
                 pass
             
             driver.find_element_by_xpath('//*[@id="login_form"]/ul/li[3]/input').click()
             try:
                 if driver.find_element_by_xpath('//*[@id="header"]/nav/a[1]'):
-                    printlog("Homepage rilevata. Login effettuato")
+                    printlog("[DRIVER] Homepage rilevata. Login effettuato")
                     messagebox.showinfo("Info", 'Login effettuato')
             except:
                 messagebox.showerror('WARNING', "Non sono riuscito a rilevare la homepage di Facebook, verifica se si è presentato un errore sul WebDriver o se Facebook ha bisogno di identificarti")
-                printlog("Non sono riuscito a rilevare la homepage di Facebook, verifica se si è presentato un errore sul WebDriver o se Facebook ha bisogno di identificarti")
+                printlog("[WARNING][DRIVER] HomePage non rilevata")
                 pass
         except Exception as login_err:
-            printlog("Errore nella funzione 'login': " + str(login_err))
+            printlog("[ERROR][DRIVER] Funzione: 'login': " + str(login_err))
             messagebox.showerror("Errore nella funzione 'login'", str(login_err))
             pass
     
     def logout(self, driver, url, session_id, chrome_options):
         try:
-            printlog("Eseguo il logout")
+            printlog("[STARTED] Logout")
             driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
-            printlog("Sessione remota del WebDriver: " + session_id)
-            printlog("URL server locale di controllo: " + url)
-            printlog("Ritorno alla homepage...")
+            printlog("[DRIVER] Sessione remota del WebDriver: " + session_id)
+            printlog("[DRIVER] URL server locale di controllo: " + url)
+            printlog("[DRIVER] Ritorno alla homepage...")
             driver.get("https://mbasic.facebook.com/")
             sleep(5)
             driver.find_element_by_xpath('//*[@id="header"]/nav/a[10]').click()
-            printlog("Logout: passaggio 1/5")
+            printlog("[DRIVER] Logout: passaggio 1/5")
             sleep(5)
             driver.find_element_by_xpath('//*[@id="mbasic_logout_button"]').click()
-            printlog("Logout: passaggio 2/5")
+            printlog("[DRIVER] Logout: passaggio 2/5")
             sleep(5)
             driver.find_element_by_xpath('//*[@id="root"]/table/tbody/tr/td/div/form[2]/input[3]').click()
-            printlog("Logout: passaggio 3/5")
+            printlog("[DRIVER] Logout: passaggio 3/5")
             sleep(5)
             driver.find_element_by_xpath('//*[@id="root"]/table/tbody/tr/td/div/div[2]/div[1]/table/tbody/tr/td[3]/a/div/img').click()
-            printlog("Logout: passaggio 4/5")
+            printlog("[DRIVER] Logout: passaggio 4/5")
             sleep(5)
             driver.find_element_by_xpath('//*[@id="root"]/table/tbody/tr/td/div[3]/div/form[1]/table/tbody/tr/td/header/h3[1]/input').click()
-            printlog("Logout: passaggio 5/5")
+            printlog("[DRIVER] Logout: passaggio 5/5")
             sleep(5)
             # check
-            printlog("Controllando se la disconnessione ha avuto successo...")
+            printlog("[DRIVER] Controllando se la disconnessione ha avuto successo...")
             if driver.find_element_by_xpath('//*[@id="login_form"]/ul/li[3]/input'):
-                printlog("Logout riuscito")
+                printlog("[DRIVER] Logout riuscito")
                 messagebox.showinfo('Info', 'Logout riuscito')
             else:
-                printlog("Logout non riuscito")
+                printlog("[WARNING][DRIVER] Logout non riuscito")
                 messagebox.showwarning('Warning', 'Logout non riuscito')
         except Exception as logout_err:
-            printlog("Errore nella funzione 'logout': " + str(logout_err))
+            printlog("[ERROR] Funzione: 'logout': " + str(logout_err))
             messagebox.showerror("Errore nella funzione 'logout'", str(logout_err))
             pass
     
@@ -311,27 +329,27 @@ class Webdriver:
                         driver = webdriver.Remote(command_executor=url, desired_capabilities={}, options=chrome_options)
                         driver.close()
                         driver.session_id = session_id
-                        printlog("Condivisione sui gruppi della lista in corso")
-                        printlog("Preparazione della lista...")
+                        printlog("[DRIVER] Condivisione sui gruppi della lista in corso")
+                        printlog("[DRIVER] Preparazione della lista...")
                         group_lines = open(lista, encoding="utf-8").readlines()
                         for line in group_lines:
                             line = line.strip()
                             line = re.sub(r' \s.*$', '', line)
                             line = line.split(" ", 1)[0]
                             facebook_groups.append(line)
-                        printlog("Lista preparata. Avvio la condivisione su %s gruppi..." % (len(facebook_groups)))
-                        printlog("Per interrompere il processo: Premi CTRL+C in questa schermata")
+                        printlog("[DRIVER] Lista preparata. Avvio la condivisione su %s gruppi..." % (len(facebook_groups)))
+                        printlog("[DRIVER] Per interrompere il processo: Premi CTRL+C in questa schermata")
                         for idx, val in enumerate(facebook_groups, 1):
                             try:
                                 for i in range(randint(1, 60), 0, -1):
                                     print("[ANTISPAM] Attesa di", i, "secondi ", end='\r')
                                     sleep(1)
-                                print("Condivisione del post in corso...", end="\r")
+                                print("[DRIVER] Condivisione del post in corso...", end="\r")
                                 if pyperclip.paste() == post:
                                     pass
                                 else:
                                     pyperclip.copy(post)
-                                    printlog("Valore nella clipboard resettato su: " + post[0:10] + "...")
+                                    printlog("[DRIVER] Valore nella clipboard resettato su: " + post[0:10] + "...")
                                 driver.get(val)
                                 title = driver.title
                                 sleep(randint(2, 4))
@@ -343,35 +361,35 @@ class Webdriver:
                                 cond = driver.find_element_by_name("view_post")
                                 sleep(randint(2, 4))
                                 cond.click()
-                                printlog("%d/%s Post condiviso a: %s" % (idx, len(facebook_groups), title))
+                                printlog("[DRIVER] %d/%s Post condiviso a: %s" % (idx, len(facebook_groups), title))
                             except Exception as err:
-                                printlog("In questo gruppo '%s' non sembra sia possibile condividere il post: %s" % (title, err))
+                                printlog("[WARNING][DRIVER] In questo gruppo '%s' non sembra sia possibile condividere il post: %s" % (title, err))
                                 pass
                             except KeyboardInterrupt:
                                 driver.quit()
-                                printlog("Condivisione interrotta")
+                                printlog("[WARNING][DRIVER] Condivisione interrotta")
                                 messagebox.showwarning('Warning', 'Condivisione interrotta')
                                 return
-                        printlog("Resetto la lista gruppi in memoria...")
+                        printlog("[DRIVER] Resetto la lista gruppi in memoria...")
                         facebook_groups.clear()
-                        printlog("Condivisione completata")
+                        printlog("[DRIVER] Condivisione completata")
                         messagebox.showinfo('Info', 'Condivisione completata')
                     else:
-                        printlog("Il WebDriver non è in esecuzione")
+                        printlog("[WARNING][DRIVER] Il WebDriver non è in esecuzione")
                         messagebox.showwarning('Warning', 'Il WebDriver non è in esecuzione')
                         pass                          
                 else:
-                    printlog("Non ci sono processi figli del WebDriver")
+                    printlog("[WARNING][DRIVER] Non ci sono processi figli del WebDriver")
                     messagebox.showwarning('Warning', 'Non ci sono processi figli del WebDriver')
                     pass
             else:
-                printlog("Processo del WebDriver non in servizio")
+                printlog("[WARNING][DRIVER] Processo del WebDriver non in servizio")
                 messagebox.showwarning('Warning', 'Processo del WebDriver non in servizio')
                 pass
             
         except Exception as cond_with_list_err:
             driver.quit()
-            printlog("Errore nella funzione 'cond_with_list': " + str(cond_with_list_err))
+            printlog("[ERROR] Funzione 'cond_with_list': " + str(cond_with_list_err))
             messagebox.showerror("Errore nella funzione 'cond_with_list'", str(cond_with_list_err))
 
     def cond_without_list(self, driver, url, session_id, post, chrome_options):
@@ -381,29 +399,29 @@ class Webdriver:
                 if chrome_process:
                     chrome_process = chrome_process[0]
                     if chrome_process.is_running():
-                        printlog("Condivisione su tutti i gruppi di cui fai parte")
-                        printlog("Cerco i gruppi")
+                        printlog("[DRIVER] Condivisione su tutti i gruppi di cui fai parte")
+                        printlog("[DRIVER] Cerco i gruppi")
                         elems = driver.find_elements_by_tag_name("a")
                         if elems:
                             for elem in elems:
                                 elem_clean = elem.get_attribute("href") # Raccolto in variabile solo gli href dell'html
                                 if elem_clean.endswith("?refid=27"): # estraggo solo le stringhe che finiscono per ?refid=27
                                     facebook_groups.append(elem_clean) # appeno il gruppo all'array
-                            printlog("Gruppi importati nell'array: " + len(facebook_groups))
-                            printlog("Procedo con la condivisione")
-                            printlog("Per interrompere il processo: Premi CTRL+C in questa schermata")
+                            printlog("[DRIVER] Gruppi importati nell'array: " + len(facebook_groups))
+                            printlog("[DRIVER] Procedo con la condivisione")
+                            printlog("[DRIVER] Per interrompere il processo: Premi CTRL+C in questa schermata")
 
                             for idx, val in enumerate(facebook_groups, 1):
                                 try:
                                     for i in range(randint(1, 60), 0, -1):
                                         print("[ANTISPAM] Attesa di", i, "secondi ", end='\r')
                                         sleep(1)                        
-                                    print("Condivisione del post in corso...", end="\r")   
+                                    print("[DRIVER] Condivisione del post in corso...", end="\r")   
                                     if pyperclip.paste() == post:
                                         pass
                                     else:
                                         pyperclip.copy(post)
-                                        printlog("Valore nella clipboard resettato su: " + post[0:10] + "...")                             
+                                        printlog("[DRIVER] Valore nella clipboard resettato su: " + post[0:10] + "...")                             
                                     driver.get(val)
                                     title = driver.title
                                     pyperclip.copy(post)
@@ -415,37 +433,37 @@ class Webdriver:
                                     sleep(randint(4, 8))
                                     driver.find_element_by_name("view_post").click()
                                     sleep(randint(2, 6))
-                                    printlog("[+] %d/%s Post inviato a: %s" % (idx, len(facebook_groups), title))
+                                    printlog("[DRIVER] %d/%s Post inviato a: %s" % (idx, len(facebook_groups), title))
                                 except Exception as err:
-                                    printlog("In questo gruppo '%s' non sembra possibile condividere il post: %s" % (title, err))
+                                    printlog("[WARNING][DRIVER] In questo gruppo '%s' non sembra possibile condividere il post: %s" % (title, err))
                                     pass
                                 except KeyboardInterrupt:
-                                    printlog("Condivisione interrotta")
+                                    printlog("[WARNING][DRIVER] Condivisione interrotta")
                                     messagebox.showwarning('Warning', 'Condivisione interrotta')
                                     return
                             facebook_groups.clear()
-                            printlog("Condivisione completata")
+                            printlog("[DRIVER] Condivisione completata")
                             messagebox.showinfo('Info', 'Condivisione completata')
                         else:
-                            printlog("Gruppi non trovati")
+                            printlog("[WARNING][DRIVER] Gruppi non trovati")
                             messagebox.showinfo('Warning', 'Gruppi non trovati')
 
                     else:
-                        printlog("Il WebDriver non è in esecuzione")
+                        printlog("[WARNING][DRIVER] Il WebDriver non è in esecuzione")
                         messagebox.showwarning('Warning', 'Il WebDriver non è in esecuzione')
                         pass                          
                 else:
-                    printlog("Non ci sono processi figli del WebDriver")
+                    printlog("[WARNING][DRIVER] Non ci sono processi figli del WebDriver")
                     messagebox.showwarning('Warning', 'Non ci sono processi figli del WebDriver')
                     pass
             else:
-                printlog("Processo del WebDriver non in servizio")
+                printlog("[WARNING][DRIVER] Processo del WebDriver non in servizio")
                 messagebox.showwarning('Warning', 'Processo del WebDriver non in servizio')
                 pass
 
         except Exception as cond_without_list_err:
             driver.quit()
-            printlog("Errore nella funzione 'cond_without_list': " + str(cond_without_list_err))
+            printlog("[ERROR][DRIVER] Funzione: 'cond_without_list': " + str(cond_without_list_err))
             messagebox.showerror("Errore nella funzione 'cond_without_list'", str(cond_without_list_err))
 
     def get_groups(self, driver, url, session_id, chrome_options):
@@ -453,13 +471,13 @@ class Webdriver:
             driver = webdriver.Remote(command_executor=url,desired_capabilities={}, options=chrome_options)
             driver.close()
             driver.session_id = session_id
-            printlog("Estrazione dei gruppi in corso...")
+            printlog("[DRIVER] Estrazione dei gruppi in corso...")
             driver.get("https://mbasic.facebook.com/groups/")
             sleep(randint(2, 4))
             driver.find_element_by_xpath("//span[contains(text(),'Mostra tutti')]").click()
             sleep(randint(2, 4))
             gp_list = "ListaGruppi.txt"
-            printlog("Cerco i gruppi...")
+            printlog("[DRIVER] Cerco i gruppi...")
             elems = driver.find_elements_by_tag_name("a")
             if elems:
                 for elem in elems:
@@ -468,25 +486,24 @@ class Webdriver:
                         name_clean = elem.get_attribute('text')
                         blob = elem_clean + " : " + name_clean
                         facebook_groups.append(blob) # appeno il gruppo all'array
-                printlog("Salvataggio di %s gruppi in corso..." % (len(facebook_groups)))
+                printlog("[DRIVER] Salvataggio di %s gruppi in corso..." % (len(facebook_groups)))
                 dump = open(dirFile+gp_list, "w", encoding='utf-8')
                 for x in facebook_groups:
                     dump.write(x + "\n")
                 dump.close()
-                printlog("Gruppi salvati qui: " + dirFile + gp_list)
+                printlog("[DRIVER] Gruppi salvati qui: " + dirFile + gp_list)
                 facebook_groups.clear()
                 messagebox.showinfo('Info', "Gruppi salvati qui: " + dirFile + gp_list)
                 lista.insert(0, dirFile + gp_list)
             else:
-                printlog("Gruppi non trovati")
+                printlog("[WARNING][DRIVER] Gruppi non trovati")
                 messagebox.showwarning('Warning', 'Gruppi non trovati')
         except Exception as get_groups_err:
-            printlog("Errore nella funzione 'get_groups': " + str(get_groups_err))
+            printlog("[ERROR][DRIVER] Funzione 'get_groups': " + str(get_groups_err))
             messagebox.showerror("Errore nella funzione 'get_groups'", str(get_groups_err))
 # Termine della classe
 # Inizio funzioni out of class
 def user_login():
-    printlog("Avvio il processo connessione dell'account su Facebook...")
     if len(email.get()) > 0:
         if len(password.get()) > 0:
             global utente
@@ -516,26 +533,25 @@ def user_login():
             url = driver.command_executor._url
             session_id = driver.session_id 
             driver_process = psutil.Process(driver.service.process.pid)
-            printlog("WebDriver process: " + str(driver_process))
-            printlog("WebDriver session id: " + session_id)
+            printlog("[DRIVER] WebDriver process: " + str(driver_process))
+            printlog("[DRIVER] WebDriver session id: " + session_id)
             printlog("Il WebDriver è nella modalità 'incognito/privata' quindi non verrà salvato nessun dato in locale")
             utente = Webdriver(email.get(), password.get())
             utente.login(driver, url, session_id, chrome_options)
             pass
         else:
-            printlog("Campo password vuoto")
+            printlog("[WARNING] Campo password vuoto")
             messagebox.showwarning("Warning", "Campo PASSWORD vuoto")
             pass
     else:
-        printlog("Campo email vuoto")
+        printlog("[WARNING] Campo email vuoto")
         messagebox.showwarning("Warning", "Campo EMAIL vuoto")
         pass
 
 def user_logout():
-    printlog("Avvio il processo di logout dell'account da Facebook...")
     try:         
         if driver_process.is_running():
-            printlog("Controllo se il WebDriver è attivo per eseguire il logout")
+            printlog("[DRIVER] Controllo se il WebDriver è attivo per eseguire il logout")
             chrome_process = driver_process.children()
             if chrome_process:
                 chrome_process = chrome_process[0]
@@ -543,24 +559,24 @@ def user_logout():
                     utente.logout(driver, url, session_id, chrome_options)
                     pass
                 else:
-                    printlog("Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
+                    printlog("[WARNING] Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
                     messagebox.showwarning('Warning', 'Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova')
                     pass
             else:
-                printlog("Non ci sono processi figli del WebDriver, esegui il Login e riprova")
+                printlog("[WARNING] Non ci sono processi figli del WebDriver, esegui il Login e riprova")
                 messagebox.showwarning('Warning', 'Non ci sono processi figli del WebDriver, esegui il Login e riprova')
                 pass
         else:
-            printlog("WebDriver non in funzione")
+            printlog("[WARNING] WebDriver non in funzione")
             messagebox.showwarning('Warning', 'WebDriver non in funzione')
             pass
     except Exception as user_logout_error:
         if str(user_logout_error) == "name 'driver_process' is not defined":
-            printlog("Processo del WebDriver non valorizzato, effettua prima il Login")
+            printlog("[WARNING] Processo del WebDriver non valorizzato, effettua prima il Login")
             messagebox.showerror('Error', "Processo del WebDriver non valorizzato, effettua prima il Login")
             pass
         else:
-            printlog("Problema nella funzione 'Logout': " + str(user_logout_error))
+            printlog("[ERROR] Funzione 'Logout': " + str(user_logout_error))
             messagebox.showerror("Problema nella funzione 'Logout'", str(user_logout_error))
             pass
 
@@ -571,12 +587,11 @@ def lista_import():
         lista.insert(0, ilist)
         pass
     except Exception as lista_import_err:
-        printlog("Problemi nella funzione 'lista_import': " + str(lista_import_err))
+        printlog("[ERROR] Funzione 'lista_import': " + str(lista_import_err))
         messagebox.showerror("Errore nella funzione 'lista_import'", str(lista_import_err))
         pass
 
 def lista_export():
-    printlog("Avvio il processo di esportazione della lista gruppi da Facebook...")
     try:
         if driver_process.is_running():
             printlog("Controllo se il WebDriver è attivo per eseguire il logout")
@@ -587,15 +602,15 @@ def lista_export():
                     utente.get_groups(driver, url, session_id, chrome_options)
                     pass
                 else:
-                    printlog("Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
+                    printlog("[WARNING] Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova")
                     messagebox.showwarning('Warning', 'Non posso eseguire il logout se il WebDriver non è attivo, esegui il LOGIN e riprova')
                     pass
             else:
-                printlog("Non ci sono processi figli del WebDriver, esegui il Login e riprova")
+                printlog("[WARNING] Non ci sono processi figli del WebDriver, esegui il Login e riprova")
                 messagebox.showwarning('Warning', 'Non ci sono processi figli del WebDriver, esegui il Login e riprova')
                 pass
         else:
-            printlog("WebDriver non in funzione")
+            printlog("[WARNING] WebDriver non in funzione")
             messagebox.showwarning('Warning', 'WebDriver non in funzione')
             pass
     except Exception as lista_export_err:
@@ -604,23 +619,22 @@ def lista_export():
             messagebox.showwarning('Warning', 'Effettua prima il Login')
             pass
         elif str(lista_export_err) == "name 'driver_process' is not defined":
-            print('Processo del WebDriver non valorizzato, effettua prima il Login')
+            printlog('[WARNING] Processo del WebDriver non valorizzato, effettua prima il Login')
             messagebox.showwarning('Warning', 'Processo del WebDriver non valorizzato, effettua prima il Login')
             pass
         else:
-            printlog("Errore nella funzione 'lista_export': " + str(lista_export_err))
+            printlog("[ERROR] Funzione 'lista_export': " + str(lista_export_err))
             messagebox.showerror("Errore nella funzione 'lista_export'", str(lista_export_err))
             pass
 
 def user_share():
-    printlog("Avvio il processo di condivisione...")
     try:
         if len(lista.get()) > 1:
             if path.exists(lista.get()):
                 utente.cond_with_list(driver, url, session_id, lista.get(), post.get("1.0","end-1c"), chrome_options)
                 pass
             else:
-                printlog("Errore: La lista sembra non essere accessibile o forse è danneggiata")
+                printlog("[WARNING] La lista sembra non essere accessibile o forse è danneggiata")
                 messagebox.showerror('Errore', 'La lista sembra non essere accessibile o forse è danneggiata')
                 pass
         else:
@@ -632,16 +646,16 @@ def user_share():
             messagebox.showwarning('Warning', 'Effettua prima il Login')
             pass
         elif str(user_share_err) == "name 'driver_process' is not defined":
-            printlog("Processo del WebDriver non valorizzato, effettua prima il Login")
+            printlog("[WARNING] Processo del WebDriver non valorizzato, effettua prima il Login")
             messagebox.showerror('Error', "Processo del WebDriver non valorizzato, effettua prima il Login")
             pass
         else:
-            printlog("Errore nella funzione 'user_share': " + str(user_share_err))
+            printlog("[ERROR] Funzione 'user_share': " + str(user_share_err))
             messagebox.showerror("Errore nella funzione 'user_share'", str(user_share_err))
             pass
 
 def lista_edit():
-    printlog("Modifica lista gruppi")
+    printlog("[STARTED] Modifica lista gruppi")
     if path.exists(dirFile + "ListaGruppi.txt"):
         if name == "nt":
             printlog("Apertura della lista gruppi")
@@ -650,19 +664,19 @@ def lista_edit():
             printlog("Apertura della lista gruppi")
             system("xdg-open %s" % (dirFile + "/ListaGruppi.txt"))
     else:
-        printlog("Lista gruppi non trovata")
+        printlog("[WARNING] Lista gruppi non trovata")
         messagebox.showwarning('Warning', 'Lista gruppi non trovata')
         pass
 
 def sviluppatore():
-    printlog("Apertura di https://github.com/FebVeg/ShareBOT/ in corso...")
+    printlog("[STARTED] Apertura di https://github.com/FebVeg/ShareBOT/ in corso...")
     if name == "nt":
         startfile("https://github.com/FebVeg/ShareBOT")
     elif name == "posix":
         system("xdg-open https://github.com/FebVeg/ShareBOT")
 
 def user_exit():
-    printlog("Tento l'uscita logica di ShareBOT...")
+    printlog("[STARTED] Chiusura di ShareBOT")
     try:         
         if driver_process.is_running():
             chrome_process = driver_process.children()
@@ -691,7 +705,7 @@ def user_exit():
             master.destroy()
             exit()
         else:
-            printlog("Errore nella funzione 'user_exit': " + str(user_exit_err))
+            printlog("[ERROR] Funzione 'user_exit': " + str(user_exit_err))
             master.destroy()
             exit()
 
